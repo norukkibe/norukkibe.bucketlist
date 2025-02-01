@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bucket List Tool</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
+        #bucket-list { list-style-type: none; padding: 0; }
+        li { padding: 10px; border-bottom: 1px solid #ccc; display: flex; justify-content: space-between; }
+        .completed { text-decoration: line-through; color: gray; }
+        button { margin-left: 10px; }
+    </style>
+</head>
+<body>
+    <h1>My Bucket List</h1>
+    <input type="text" id="item-input" placeholder="Add a new item...">
+    <button onclick="addItem()">Add</button>
+    <ul id="bucket-list"></ul>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", loadItems);
+
+        function addItem() {
+            const input = document.getElementById("item-input");
+            const itemText = input.value.trim();
+            if (itemText === "") return;
+
+            const li = document.createElement("li");
+            li.innerHTML = `<span onclick="toggleComplete(this)">${itemText}</span>
+                            <button onclick="removeItem(this)">Remove</button>`;
+
+            document.getElementById("bucket-list").appendChild(li);
+            saveItems();
+            input.value = "";
+        }
+
+        function toggleComplete(span) {
+            span.classList.toggle("completed");
+            saveItems();
+        }
+
+        function removeItem(button) {
+            button.parentElement.remove();
+            saveItems();
+        }
+
+        function saveItems() {
+            const items = [];
+            document.querySelectorAll("#bucket-list li").forEach(li => {
+                items.push({ text: li.querySelector("span").textContent, completed: li.querySelector("span").classList.contains("completed") });
+            });
+            localStorage.setItem("bucketList", JSON.stringify(items));
+        }
+
+        function loadItems() {
+            const items = JSON.parse(localStorage.getItem("bucketList")) || [];
+            items.forEach(item => {
+                const li = document.createElement("li");
+                li.innerHTML = `<span onclick="toggleComplete(this)" class="${item.completed ? 'completed' : ''}">${item.text}</span>
+                                <button onclick="removeItem(this)">Remove</button>`;
+                document.getElementById("bucket-list").appendChild(li);
+            });
+        }
+    </script>
+</body>
+</html>
